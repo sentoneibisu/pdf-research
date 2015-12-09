@@ -1,0 +1,28 @@
+1 0 obj<<
+/Type /Catalog
+/OpenAction <<
+/S /Javascript
+/JS (alert('hello!');)
+>>
+/Pages 3 0 R
+>>endobj
+
+3 0 obj<<
+/Type /Pages
+/Kids [22 0 R 23 0 R]
+/Count 2
+>>endobj
+
+22 0 obj<<
+/Type /Page
+/Paren 3 0 R
+/MediaBox [0 0 612 792]
+/Resources (...)
+>>endobj
+
+23 0 obj<<
+/Type /Page
+/Paren 3 0 R
+/MediaBox [0 0 333 444]
+/Resources (...)
+>>endobj
