@@ -19,7 +19,8 @@ pID = re.compile(r'\s*(<[a-zA-Z0-9]+>\s*<[a-zA-Z0-9]+>)\s*')
 pString2 = re.compile(r'\s*(<([a-zA-Z0-9]{2}\s*)+>)\s*')
 # zenntei : mojiretu nado no naka ni '(' ya ')' ya '<' ya '>' ya '[' ya ']' ga nai koto!!
 pString = regex.compile(r'\s*(?<rec>\((?:[^()]+|(?&rec))*\))\s*')
-pDict = regex.compile(r'\s*(?<rec><<(?:[^<>]+|(?&rec))*>>)\s*')
+#pDict = regex.compile(r'\s*(?<rec><<(?:[^<>]+|(?&rec))*>>)\s*')
+pDict = regex.compile(r'\s*(?<rec><<(?:(?:[^<>]+(?:[<>]?|><|<>))+|(?&rec))*>>)\s*')
 #pArray = regex.compile(r'\s*(?<rec>\[(?:[^\[\]]+|(?&rec))*\])\s*')
 pArray = regex.compile(r'\s*(?<rec>\[(?:[^\[\]]*|(?&rec))*\])\s*')
 
@@ -44,6 +45,8 @@ def Main():
         try:
             parsed[current_obj] = ParseObj(non_stream_data)
         except:
+            print 'sys.exc_info():'
+            print sys.exc_info()
             continue
 
         PrintObjs()
@@ -118,7 +121,7 @@ def ParseDict(contents):
                     if mPair:
                         pairs[mName.group(1)] = mPair.group(1)
                     else:
-                        print 'Missing! in ParseDict()'
+                        print '[ParseError]Missing! in ParseDict()'
                         #sys.exit(1)
                         raise Exception
         elif mRight.group(1)[0] == '(':
@@ -137,7 +140,7 @@ def ParseDict(contents):
             pairs[mName.group(1)] = mPair.group(1)
 
         else:
-            # ID
+            # ID or string
             mPair = pID.match(mRight.group())
             if mPair:
                 pairs[mName.group(1)] = mPair.group(1)
