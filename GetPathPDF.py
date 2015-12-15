@@ -18,16 +18,17 @@ pID = re.compile(r'\s*(<[a-zA-Z0-9]+>\s*<[a-zA-Z0-9]+>)\s*')
 #pString2 = re.compile(r'\s*(<[a-zA-Z0-9]+>)\s*')
 pString2 = re.compile(r'\s*(<([a-zA-Z0-9]{2}\s*)+>)\s*')
 # zenntei : mojiretu nado no naka ni '(' ya ')' ya '<' ya '>' ya '[' ya ']' ga nai koto!!
-pString = regex.compile(r'\s*(?<rec>\((?:[^()]+|(?&rec))*\))\s*')
+#pString = regex.compile(r'\s*(?<rec>\((?:[^()]+|(?&rec))*\))\s*')
+pString = regex.compile(r'\s*(?<str>\((?:[^()\\]+|[\\][()\\]|(?&str))*\))\s*')
 #pDict = regex.compile(r'\s*(?<rec><<(?:[^<>]+|(?&rec))*>>)\s*')
 #pDict = regex.compile(r'\s*(?<rec><<(?:(?:[^<>]+(?:[<>]?|><|<>))+|(?&rec))*>>)\s*')
 ##pDict = regex.compile(r'\s*(?<dic><<(?<in>(?:[^<>(]+(?:[<>]?|><|<>))*|(?&str)(?&in)|(?&dic))*>>)\s*'
 ##                      r'(?<str>\((?:[^()]+|(?&str))*\)){0}')
 pDict = regex.compile(r'\s*(?<dic><<((?:[^<>(]+(?:[<>]?|><|<>))*|(?&str)|(?&dic))*>>)\s*'
-                      r'(?<str>\((?:[^()]+|(?&str))*\)){0}')
+                      r'(?<str>\((?:[^()\\]+|[\\][()\\]|(?&str))*\)){0}')
 #pArray = regex.compile(r'\s*(?<rec>\[(?:[^\[\]]*|(?&rec))*\])\s*')
 pArray = regex.compile(r'\s*(?<arr>\[(?:[^\[\](]*|(?&str)|(?&arr))*\])\s*'
-                       r'(?<str>\((?:[^()]+|(?&str))*\)){0}')
+                       r'(?<str>\((?:[^()\\]+|[\\][()\\]|(?&str))*\)){0}')
 
 def Main():
     target_pdf = sys.argv[1]
