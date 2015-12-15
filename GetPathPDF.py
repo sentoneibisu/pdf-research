@@ -19,13 +19,28 @@ pID = re.compile(r'\s*(<[a-zA-Z0-9]+>\s*<[a-zA-Z0-9]+>)\s*')
 pString2 = re.compile(r'\s*(<([a-zA-Z0-9]{2}\s*)+>)\s*')
 # zenntei : mojiretu nado no naka ni '(' ya ')' ya '<' ya '>' ya '[' ya ']' ga nai koto!!
 pString = regex.compile(r'\s*(?<rec>\((?:[^()]+|(?&rec))*\))\s*')
-pDict = regex.compile(r'\s*(?<rec><<(?:[^<>]+|(?&rec))*>>)\s*')
+#pDict = regex.compile(r'\s*(?<rec><<(?:[^<>]+|(?&rec))*>>)\s*')
+pDict = regex.compile(r'\s*(?<rec><<(?:(?:[^<>]+(?:[<>]?|><|<>))+|(?&rec))*>>)\s*')
 #pArray = regex.compile(r'\s*(?<rec>\[(?:[^\[\]]+|(?&rec))*\])\s*')
 pArray = regex.compile(r'\s*(?<rec>\[(?:[^\[\]]*|(?&rec))*\])\s*')
 
 def Main():
     target_pdf = sys.argv[1]
-    print '[*] open : %s' % target_pdf
+    if len(sys.argv) > 2:
+        target_pdf = ""
+        for x in sys.argv[1:]:
+            target_pdf += x
+            target_pdf += ' '
+        target_pdf = target_pdf[:-1]
+    try:
+        with open(target_pdf,'rb') as f:
+            data = f.read()
+    except IOError:
+        print 'nan'
+        sys.exit(1)
+
+
+    print '[*] open : %s' % target_pdf[-30:]
     with open(target_pdf,'rb') as f:
         data = f.read()
     
@@ -55,7 +70,7 @@ def Main():
         ##for path in paths[current_obj]:
         ##    print path
 
-    print
+    #print
     print '--ALL PATH--'
     PrintAllPath()
 
@@ -305,7 +320,7 @@ def ResolvePath(key,parent_path=''):
     global passed_obj
     if key in passed_obj:
         #print passed_obj
-        print '[DEBUG] Detection Loop : ',parent_path
+        #print '[DEBUG] Detection Loop : ',parent_path
         all_path.append(parent_path)
         return
     passed_obj.append(key)
@@ -325,6 +340,9 @@ def ResolvePath(key,parent_path=''):
                 #print parent_path+path
         passed_obj.pop()
     except KeyError:
-        all_path.append(parent_path+'/'+key+' R'+' -------------------> '+key+' R'+' Not Found')
+        try:
+            all_path.append(parent_path+'/'+key+' R'+' -------------------> '+key+' R'+' Not Found')
+        except:
+            print "ERROR!!!!!!!!"
 
 Main()
