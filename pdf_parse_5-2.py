@@ -46,7 +46,6 @@ def Main():
     
         streams[current_obj] = re.findall(r'(?:stream[\r\n]*(.*?)[\r\n]*endstream)', obj[2], re.MULTILINE | re.DOTALL | re.IGNORECASE)
         non_stream_data = re.sub(r'stream[\r\n]*.*?[\r\n]*endstream', '', obj[2], flags=(re.MULTILINE | re.DOTALL | re.IGNORECASE))
-        non_stream_data = NameDeObf(non_stream_data)
 
         try:
             parsed[current_obj] = ParseObj(non_stream_data)
@@ -274,9 +273,9 @@ def CreateAtherPath(parent,child):
     #    return
     m = pIndRef.match(child)
     if m:
-        paths[current_obj].append(parent+'/'+child)
+        paths[current_obj].append(NameDeObf(parent+'/'+child))
     else:
-        paths[current_obj].append(parent)
+        paths[current_obj].append(NameDeObf(parent))
 
 
 def PrintAllPath():
