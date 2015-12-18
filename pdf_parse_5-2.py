@@ -244,7 +244,7 @@ def CreatePath(result):
     for i,path in enumerate(paths[current_obj]):
         try:
             #if paths[current_obj][i+1].starswith(path):
-            if path in paths[current_obj][i+1]:
+            if path+'/' in paths[current_obj][i+1]:
                 del paths[current_obj][i]
         except:
             pass
