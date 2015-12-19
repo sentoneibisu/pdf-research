@@ -8,7 +8,6 @@ current_obj = ''
 streams = {}
 parsed = {}
 paths = {}
-all_path = []
 passed_obj = []
 # for detection of loop
 
@@ -288,8 +287,6 @@ def PrintAllPath():
     print 'catalog_obj_num:',catalog_obj_num
 
     ResolvePath(catalog_obj_num)
-    for path in all_path:
-        print path
 
 
 def SearchCatalog():
@@ -317,7 +314,7 @@ def ResolvePath(key,parent_path=''):
     if key in passed_obj:
         #print passed_obj
         print '[DEBUG] Detection Loop : ',parent_path
-        all_path.append(parent_path)
+        print parent_path
         return
     passed_obj.append(key)
     print passed_obj
@@ -332,11 +329,10 @@ def ResolvePath(key,parent_path=''):
                 #print p_path
                 continue
             else:
-                all_path.append(parent_path+path)
-                #print parent_path+path
+                print parent_path+path
         passed_obj.pop()
     except KeyError:
-        all_path.append(parent_path+'/'+key+' R'+' -------------------> '+key+' R'+' Not Found')
+        print parent_path+'/'+key+' R'+' -------------------> '+key+' R'+' Not Found'
 
 
 def DecodeObjStm():
