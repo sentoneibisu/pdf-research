@@ -2,7 +2,9 @@
 import sys
 import re
 import regex
+import zlib
 
+current_obj = ''
 streams = {}
 parsed = {}
 paths = {}
@@ -31,6 +33,7 @@ pArray = regex.compile(r'\s*(?<arr>\[(?:[^\[\](]*|(?&str)|(?&arr))*\])\s*'
                        r'(?<str>\((?:[^()\\]+|[\\].|(?&str))*\)){0}')
 
 def Main():
+    global current_obj
     target_pdf = sys.argv[1]
     print '[*] open : %s' % target_pdf
     with open(target_pdf,'rb') as f:
@@ -40,7 +43,6 @@ def Main():
     # obj : ['1','0','obj data']
     for obj in objs:
         print '-'*138
-        global current_obj
         current_obj = obj[0]+' '+obj[1]
         print current_obj + ' ' + 'obj'
     
@@ -63,10 +65,13 @@ def Main():
         for path in paths[current_obj]:
             print path
 
+        inner_objects = DecodeObjStm()
+        if inner_objects:
+            ParseObjStm(inner_objects)
+
     print
     print '--ALL PATH--'
     PrintAllPath()
-
 
 def NameDeObf(data):
     return re.sub(r'#([a-fA-F0-9]{2})', lambda mo: chr(int('0x' + mo.group(1), 0)), data)
@@ -332,5 +337,67 @@ def ResolvePath(key,parent_path=''):
         passed_obj.pop()
     except KeyError:
         all_path.append(parent_path+'/'+key+' R'+' -------------------> '+key+' R'+' Not Found')
+
+
+def DecodeObjStm():
+    decompressed_data = '' 
+    if streams[current_obj]:
+        try:
+            if parsed[current_obj]['/Type'] == '/ObjStm':
+                if parsed[current_obj]['/Filter'] == '/FlateDecode' or parsed[current_obj]['/Filter'] == '/Fl':
+                    decompressed_data = zlib.decompress(streams[current_obj][0])
+        except:
+            pass
+    return decompressed_data
+
+def ParseObjStm(inner_objects):
+    global current_obj
+    p = re.compile(r'\s*(?P<num>[0-9]+)\s+(?P<offset>[0-9]+)\s*')
+    left_size = 0
+    inner_offsets = []
+
+    while True:
+        m = p.match(inner_objects[left_size:])
+        if not m:
+            break
+        left_size += len(m.group())
+        inner_offsets.append((m.group('num'),m.group('offset')))
+
+    print '\n==ObjStm=='
+    print '='*130
+    for key,offset in inner_offsets:
+        current_obj = key + ' ' + '0'
+        print '-'*50
+        print current_obj+' '+'obj'
+
+        m = pDict.match(inner_objects[left_size:])
+        if m:
+            left_size += len(m.group())
+        else:
+            m = pArray.match(inner_objects[left_size:])
+            if m:
+                left_size += len(m.group())
+            else:
+                print '[DEBUG] The Object in this ObjStm is not Dict and Array.'
+                sys.exit(1)
+
+        try:
+            parsed[current_obj] = ParseObj(m.group(1))
+        except:
+            print '[ObjStm]sys.exc_info():'
+            print sys.exc_info()
+            print 'm.group(1):'
+            print m.group(1)
+            continue
+        PrintObjs()
+
+        paths[current_obj] = []
+        CreatePath(parsed[current_obj])
+
+        print '--path(ObjStm)--'
+        for path in paths[current_obj]:
+            print path
+
+    print '='*130
 
 Main()
