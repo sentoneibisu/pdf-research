@@ -34,10 +34,24 @@ pArray = regex.compile(r'\s*(?<arr>\[(?:[^\[\](]*|(?&str)|(?&arr))*\])\s*'
 def Main():
     global current_obj
     target_pdf = sys.argv[1]
-    print '[*] open : %s' % target_pdf
+
+    if len(sys.argv) > 2:
+        target_pdf = ""
+        for x in sys.argv[1:]:
+            target_pdf += x
+            target_pdf += ' '
+        target_pdf = target_pdf[:-1]
+    try:
+        with open(target_pdf,'rb') as f:
+            data = f.read()
+    except IOError:
+        print 'nan'
+        sys.exit(1)
+
+    print '[*] open : %s' % target_pdf[-30:]
     with open(target_pdf,'rb') as f:
         data = f.read()
-    
+
     objs = re.findall(r'\n?(\d+)\s+(\d+)\s+obj[\s]*(.*?)\s*\n?(endobj|objend)', data, re.MULTILINE | re.DOTALL)
     # obj : ['1','0','obj data']
     for obj in objs:
