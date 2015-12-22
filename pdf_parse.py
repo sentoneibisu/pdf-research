@@ -17,7 +17,7 @@ pName = re.compile(r'\s*(/[^()<>/\[\]\s]*)\s*')
 pNum_null_bool = re.compile(r'\s*([\d+-.]+|null|false|true)\s*')
 pID = re.compile(r'\s*(<[a-zA-Z0-9]+>\s*<[a-zA-Z0-9]+>)\s*')
 #pString2 = re.compile(r'\s*(<[a-zA-Z0-9]+>)\s*')
-pString2 = re.compile(r'\s*(<([a-zA-Z0-9]{2}\s*)+>)\s*')
+pString2 = re.compile(r'\s*(<([a-zA-Z0-9]{2}\s*)*>)\s*')
 # zenntei : mojiretu nado no naka ni '(' ya ')' ya '<' ya '>' ya '[' ya ']' ga nai koto!!
 #pString = regex.compile(r'\s*(?<rec>\((?:[^()]+|(?&rec))*\))\s*')
 pString = regex.compile(r'\s*(?<str>\((?:[^()\\]+|[\\].|(?&str))*\))\s*')
