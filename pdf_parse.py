@@ -61,6 +61,7 @@ def Main():
     
         streams[current_obj] = re.findall(r'(?:stream[\r\n]*(.*?)[\r\n]*endstream)', obj[2], re.MULTILINE | re.DOTALL | re.IGNORECASE)
         non_stream_data = re.sub(r'stream[\r\n]*.*?[\r\n]*endstream', '', obj[2], flags=(re.MULTILINE | re.DOTALL | re.IGNORECASE))
+        non_stream_data = NameDeObf(non_stream_data)
 
         try:
             parsed[current_obj] = ParseObj(non_stream_data)
@@ -87,7 +88,8 @@ def Main():
     PrintAllPath()
 
 def NameDeObf(data):
-    return re.sub(r'#([a-fA-F0-9]{2})', lambda mo: chr(int('0x' + mo.group(1), 0)), data)
+    #return re.sub(r'#([a-fA-F0-9]{2})', lambda mo: chr(int('0x' + mo.group(1), 0)), data)
+    return re.sub(r'#([a-fA-F0-9]{2})', lambda mo: chr(int('0x' + mo.group(1), 0)) if mo.group(1) != '20' else '#20', data)
 
 def PrintObjs():
     if type(parsed[current_obj]) == dict:
@@ -291,9 +293,9 @@ def CreateAtherPath(parent,child):
     #    return
     m = pIndRef.match(child)
     if m:
-        paths[current_obj].append(NameDeObf(parent+'/'+child))
+        paths[current_obj].append(parent+'/'+child)
     else:
-        paths[current_obj].append(NameDeObf(parent))
+        paths[current_obj].append(parent)
 
 
 def PrintAllPath():
