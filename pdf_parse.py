@@ -52,7 +52,7 @@ def Main():
     with open(target_pdf,'rb') as f:
         data = f.read()
 
-    objs = re.findall(r'\n?(\d+)\s+(\d+)\s+obj[\s]*(.*?)\s*\n?(endobj|objend)', data, re.MULTILINE | re.DOTALL)
+    objs = re.findall(r'\n?(\d+)\s+(\d+)\s+obj[\s]*(.*?)\s*\n?(endobj|objend)', data, re.MULTILINE | re.DOTALL | re.IGNORECASE)
     # obj : ['1','0','obj data']
     for obj in objs:
         print '-'*138
