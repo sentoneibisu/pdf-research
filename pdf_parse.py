@@ -21,6 +21,7 @@ pDict = regex.compile(r'\s*(?<dic><<((?:[^<>(]+(?:[<>]?|><|<>))*|(?&str)|(?&dic)
                       r'(?<str>\((?:[^()\\]+|[\\].|(?&str))*\)){0}')
 pArray = regex.compile(r'\s*(?<arr>\[(?:[^\[\](]*|(?&str)|(?&arr))*\])\s*'
                        r'(?<str>\((?:[^()\\]+|[\\].|(?&str))*\)){0}')
+
 ##############################################################################################################################
 def Main():
     global current_obj
@@ -284,6 +285,9 @@ def CreateAtherPath(parent,child):
 ##############################################################################################################################
 def PrintAllPath():
     catalog_obj_num = SearchCatalog()
+    if catalog_obj_num == None:
+        print '[ERROR]Catalog is not found.'
+        sys.exit(1)
     print 'catalog_obj_num:',catalog_obj_num
 
     ResolvePath(catalog_obj_num)
@@ -307,6 +311,7 @@ def SearchCatalog():
                     # When there is list object under the /OpneAction
                     except AttributeError:
                         pass
+    return None
 
 ##############################################################################################################################
 def ResolvePath(key,parent_path=''):
