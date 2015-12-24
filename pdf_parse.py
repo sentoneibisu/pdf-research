@@ -8,29 +8,20 @@ current_obj = ''
 streams = {}
 parsed = {}
 paths = {}
-passed_obj = []
 # for detection of loop
+passed_obj = []
 
 pIndRef = re.compile(r'\s*([0-9]+\s+0\s+R)\s*')
-#pName = re.compile(r'\s*(/[^()<>/\[\]\s]+)\s*')
 pName = re.compile(r'\s*(/[^()<>/\[\]\s]*)\s*')
 pNum_null_bool = re.compile(r'\s*([\d+-.]+|null|false|true)\s*')
 pID = re.compile(r'\s*(<[a-zA-Z0-9]+>\s*<[a-zA-Z0-9]+>)\s*')
-#pString2 = re.compile(r'\s*(<[a-zA-Z0-9]+>)\s*')
-pString2 = re.compile(r'\s*(<([a-zA-Z0-9]{2}\s*)*>)\s*')
-# zenntei : mojiretu nado no naka ni '(' ya ')' ya '<' ya '>' ya '[' ya ']' ga nai koto!!
-#pString = regex.compile(r'\s*(?<rec>\((?:[^()]+|(?&rec))*\))\s*')
+pString2 = re.compile(r'\s*(<\s*([a-zA-Z0-9,]\s*)*>)\s*')
 pString = regex.compile(r'\s*(?<str>\((?:[^()\\]+|[\\].|(?&str))*\))\s*')
-#pDict = regex.compile(r'\s*(?<rec><<(?:[^<>]+|(?&rec))*>>)\s*')
-#pDict = regex.compile(r'\s*(?<rec><<(?:(?:[^<>]+(?:[<>]?|><|<>))+|(?&rec))*>>)\s*')
-##pDict = regex.compile(r'\s*(?<dic><<(?<in>(?:[^<>(]+(?:[<>]?|><|<>))*|(?&str)(?&in)|(?&dic))*>>)\s*'
-##                      r'(?<str>\((?:[^()]+|(?&str))*\)){0}')
 pDict = regex.compile(r'\s*(?<dic><<((?:[^<>(]+(?:[<>]?|><|<>))*|(?&str)|(?&dic))*>>)\s*'
                       r'(?<str>\((?:[^()\\]+|[\\].|(?&str))*\)){0}')
-#pArray = regex.compile(r'\s*(?<rec>\[(?:[^\[\]]*|(?&rec))*\])\s*')
 pArray = regex.compile(r'\s*(?<arr>\[(?:[^\[\](]*|(?&str)|(?&arr))*\])\s*'
                        r'(?<str>\((?:[^()\\]+|[\\].|(?&str))*\)){0}')
-
+##############################################################################################################################
 def Main():
     global current_obj
     target_pdf = sys.argv[1]
@@ -87,10 +78,11 @@ def Main():
     print '--ALL PATH--'
     PrintAllPath()
 
+##############################################################################################################################
 def NameDeObf(data):
-    #return re.sub(r'#([a-fA-F0-9]{2})', lambda mo: chr(int('0x' + mo.group(1), 0)), data)
     return re.sub(r'#([a-fA-F0-9]{2})', lambda mo: chr(int('0x' + mo.group(1), 0)) if mo.group(1) != '20' else '#20', data)
 
+##############################################################################################################################
 def PrintObjs():
     if type(parsed[current_obj]) == dict:
         for key in parsed[current_obj].keys():
@@ -98,7 +90,7 @@ def PrintObjs():
     elif type(parsed[current_obj]) == list:
             print parsed[current_obj]
 
-    
+##############################################################################################################################
 def ParseObj(contents):
     if contents[0:2] == '<<':
         p = ParseDict(contents[2:-2])
@@ -109,16 +101,13 @@ def ParseObj(contents):
     
     elif contents[0] == '[':
         l = ParseArray(contents[1:-1])
-        #print '[',
         for x in xrange(len(l)):
             l[x] = ParseObj(l[x])
-            #print '%s,' % (l[x]),
-        #print ']'
         return l
     else:
         return contents
 
-
+##############################################################################################################################
 def ParseDict(contents):
     left_size = 0
     pairs = {}
@@ -147,7 +136,6 @@ def ParseDict(contents):
                         pairs[mName.group(1)] = mPair.group(1)
                     else:
                         print '[ParseError]Missing! in ParseDict()'
-                        #sys.exit(1)
                         raise Exception
         elif mRight.group(1)[0] == '(':
             # string
@@ -177,7 +165,7 @@ def ParseDict(contents):
 
     return pairs
 
-
+##############################################################################################################################
 def ParseArray(contents):
     left_size = 0
     array = []
@@ -211,7 +199,6 @@ def ParseArray(contents):
                         else:
                             print '[DEBUG] mRight.group():',mRight.group()
                             print 'Missing! in ParseArray()'
-                            #sys.exit(1)
                             raise Exception
         elif mRight.group(1)[0] == '(':
             # string
@@ -241,7 +228,7 @@ def ParseArray(contents):
 
     return array
 
-
+##############################################################################################################################
 def CreatePath(result):
     if type(result) == dict:
         CreateDictPath('',result)
@@ -253,7 +240,6 @@ def CreatePath(result):
     # muriyaridaga...
     while '' in paths[current_obj]:
         paths[current_obj].remove('')
-    # muriyaridaga...
     new_paths = []
     for path in paths[current_obj]:
         if not path in new_paths:
@@ -262,14 +248,12 @@ def CreatePath(result):
     
     for i,path in enumerate(paths[current_obj]):
         try:
-            #if paths[current_obj][i+1].starswith(path):
             if path+'/' in paths[current_obj][i+1]:
                 del paths[current_obj][i]
         except:
             pass
 
-
-
+##############################################################################################################################
 def CreateDictPath(parent,child):
     for brother in child.keys():
         if type(child[brother]) == dict:
@@ -279,6 +263,7 @@ def CreateDictPath(parent,child):
         else:
             CreateAtherPath(parent+brother,child[brother])
 
+##############################################################################################################################
 def CreateArrayPath(parent,child):
     for brother in child:
         if type(brother) == dict:
@@ -288,23 +273,22 @@ def CreateArrayPath(parent,child):
         else:
             CreateAtherPath(parent,brother)
 
+##############################################################################################################################
 def CreateAtherPath(parent,child):
-    #if parent == '':
-    #    return
     m = pIndRef.match(child)
     if m:
         paths[current_obj].append(parent+'/'+child)
     else:
         paths[current_obj].append(parent)
 
-
+##############################################################################################################################
 def PrintAllPath():
     catalog_obj_num = SearchCatalog()
     print 'catalog_obj_num:',catalog_obj_num
 
     ResolvePath(catalog_obj_num)
 
-
+##############################################################################################################################
 def SearchCatalog():
     for obj_num in parsed.keys():
         if type(parsed[obj_num]) == list or type(parsed[obj_num]) == str:
@@ -324,7 +308,7 @@ def SearchCatalog():
                     except AttributeError:
                         pass
 
-
+##############################################################################################################################
 def ResolvePath(key,parent_path=''):
     global passed_obj
     if key in passed_obj:
@@ -350,7 +334,7 @@ def ResolvePath(key,parent_path=''):
     except KeyError:
         print parent_path+'/'+key+' R'+' -------------------> '+key+' R'+' Not Found'
 
-
+##############################################################################################################################
 def DecodeObjStm():
     decompressed_data = '' 
     if streams[current_obj]:
@@ -362,6 +346,7 @@ def DecodeObjStm():
             pass
     return decompressed_data
 
+##############################################################################################################################
 def ParseObjStm(inner_objects):
     global current_obj
     p = re.compile(r'\s*(?P<num>[0-9]+)\s+(?P<offset>[0-9]+)\s*')
