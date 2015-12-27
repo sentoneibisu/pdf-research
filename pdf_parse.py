@@ -16,7 +16,7 @@ pName = re.compile(r'\s*(/[^()<>/\[\]\s]*)\s*')
 pNum_null_bool = re.compile(r'\s*([\d+-.]+|null|false|true)\s*')
 pID = re.compile(r'\s*(<[a-zA-Z0-9]+>\s*<[a-zA-Z0-9]+>)\s*')
 pString2 = re.compile(r'\s*(<\s*([a-zA-Z0-9,]\s*)*>)\s*')
-pString = regex.compile(r'\s*(?<str>\((?:[^()\\]+|[\\].|(?&str))*\))\s*')
+pString = regex.compile(r'\s*(?<str>\((?:[^()\\]+|[\\].?|(?&str))*\))\s*')
 pDict = regex.compile(r'\s*(?<dic><<((?:[^<>(]+(?:[<>]?|><|<>))*|(?&str)|(?&dic))*>>)\s*'
                       r'(?<str>\((?:[^()\\]+|[\\].|(?&str))*\)){0}')
 pArray = regex.compile(r'\s*(?<arr>\[(?:[^\[\](]*|(?&str)|(?&arr))*\])\s*'
