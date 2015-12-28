@@ -194,8 +194,8 @@ def ParseArray(contents):
                     if mElem:
                         array.append(mElem.group(1))
                     else:
-                        if mRight.group(1) == ' ':
-                            # case of space only in array : (ex. <</ABC [ ]>>)
+                        if mRight.group(1) in ' \r\n':
+                            # case of space only in array : (e.g. <</ABC [ ]>>)
                             break
                         else:
                             print '[DEBUG] mRight.group():',mRight.group()
