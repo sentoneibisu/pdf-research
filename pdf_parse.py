@@ -80,8 +80,22 @@ def Main():
     PrintAllPath()
 
 ##############################################################################################################################
+"""
+ignore
+         #20 : space
+         #28 : (
+         #29 : )
+         #2f : /
+         #3c : <
+         #3e : >
+         #5b : [
+         #5d : ]
+"""
 def NameDeObf(data):
-    return re.sub(r'#([a-fA-F0-9]{2})', lambda mo: chr(int('0x' + mo.group(1), 0)) if mo.group(1) != '20' else '#20', data)
+    return re.sub(r'#([a-fA-F0-9]{2})',\
+                  lambda mo: chr(int('0x' + mo.group(1), 0))\
+                  if mo.group(1).lower() not in  ('20','28','29','2f','3c','3e','5b','5d') else '#' + mo.group(1),\
+                  data)
 
 ##############################################################################################################################
 def PrintObjs():
@@ -318,7 +332,7 @@ def ResolvePath(key,parent_path=''):
     global passed_obj
     if key in passed_obj:
         #print passed_obj
-        print '[DEBUG] Detection Loop : ',parent_path
+        #print '[DEBUG] Detection Loop : ',parent_path
         print parent_path
         return
     passed_obj.append(key)
