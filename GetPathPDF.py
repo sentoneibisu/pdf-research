@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 import sys
 import re
 import regex
@@ -29,6 +30,8 @@ def Main():
     global current_obj
     target_pdf = sys.argv[1]
 
+    # ファイル名に空白が含まれていた場合，コマンドライン引数として分割されてしまうため，
+    # それらを空白で連結して一つの文字列にする (ただしファイル名に空白が連続2つ以上ある場合には未対応)
     if len(sys.argv) > 2:
         target_pdf = ""
         for x in sys.argv[1:]:
@@ -41,9 +44,6 @@ def Main():
     except IOError:
         print 'nan'
         sys.exit(1)
-
-    with open(target_pdf,'rb') as f:
-        data = f.read()
 
     objs = re.findall(r'\n?(\d+)\s+(\d+)\s+obj[\s]*(.*?)\s*\n?(endobj|objend)', data, re.MULTILINE | re.DOTALL | re.IGNORECASE)
     # (Example) obj : ['1','0','(obj data)']
