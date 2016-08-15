@@ -23,7 +23,7 @@ pDict = regex.compile(r'\s*(?<dic><<((?:[^<>(]+(?:[<>]?|><|<>))*|(?&str)|(?&dic)
 pArray = regex.compile(r'\s*(?<arr>\[(?:[^\[\](]*|(?&str)|(?&arr))*\])\s*'
                        r'(?<str>\((?:[^()\\]+|[\\].|(?&str))*\)){0}')
 
-output_file = open('a.txt', 'w')
+#output_file = open('a.txt', 'w')
 
 ##############################################################################################################################
 def Main():
@@ -323,8 +323,8 @@ def SearchCatalog():
 def ResolvePath(key,parent_path=''):
     global passed_obj
     if key in passed_obj:
-        output_file.write(parent_path + '\n')
-        #Wprint parent_path
+        #output_file.write(parent_path + '\n')
+        print parent_path
         return
     passed_obj.append(key)
     try:
@@ -336,8 +336,8 @@ def ResolvePath(key,parent_path=''):
                 ResolvePath(child_key,p_path)
                 continue
             else:
-                #print parent_path+path
-                output_file.write(parent_path + path + '\n')
+                print parent_path + path
+                #output_file.write(parent_path + path + '\n')
         passed_obj.pop()
     except KeyError:
         print parent_path+'/'+key+' R'+' -------------------> '+key+' R'+' Not Found'
@@ -396,4 +396,4 @@ def ParseObjStm(inner_objects):
         CreatePath(parsed[current_obj])
 
 Main()
-output_file.close()
+#output_file.close()
