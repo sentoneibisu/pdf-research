@@ -32,7 +32,7 @@ def Main():
     # ファイル名に空白が含まれていた場合，コマンドライン引数として分割されてしまうため，
     # それらを空白で連結して一つの文字列にする (ただしファイル名に空白が連続2つ以上ある場合には未対応)
     if len(sys.argv) == 1:
-        print '[+] Usage: ./get_pdf_path.py PDF_FILE'
+        print '[+] Usage: ./GetPathPDF.py PDF_FILE'
         sys.exit(1)
     elif len(sys.argv) == 2:
         target_pdf = sys.argv[1]
