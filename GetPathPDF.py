@@ -28,16 +28,16 @@ pArray = regex.compile(r'\s*(?<arr>\[(?:[^\[\](]*|(?&str)|(?&arr))*\])\s*'
 ##############################################################################################################################
 def Main():
     global current_obj
-    target_pdf = sys.argv[1]
 
     # ファイル名に空白が含まれていた場合，コマンドライン引数として分割されてしまうため，
     # それらを空白で連結して一つの文字列にする (ただしファイル名に空白が連続2つ以上ある場合には未対応)
-    if len(sys.argv) > 2:
-        target_pdf = ""
-        for x in sys.argv[1:]:
-            target_pdf += x
-            target_pdf += ' '
-        target_pdf = target_pdf[:-1]
+    if len(sys.argv) == 1:
+        print '[+] Usage: ./get_pdf_path.py PDF_FILE'
+        sys.exit(1)
+    elif len(sys.argv) == 2:
+        target_pdf = sys.argv[1]
+    else:
+        target_pdf = ' '.join(sys.argv[1:])
     try:
         with open(target_pdf,'rb') as f:
             data = f.read()
