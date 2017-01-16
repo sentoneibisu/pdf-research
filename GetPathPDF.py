@@ -39,14 +39,14 @@ def Main():
     else:
         target_pdf = ' '.join(sys.argv[1:])
     try:
-        with open(target_pdf,'rb') as f:
+        with open(target_pdf, 'rb') as f:
             data = f.read()
     except IOError:
         print 'nan'
         sys.exit(1)
 
     objs = re.findall(r'\n?(\d+)\s+(\d+)\s+obj[\s]*(.*?)\s*\n?(endobj|objend)', data, re.MULTILINE | re.DOTALL | re.IGNORECASE)
-    # (Example) obj : ['1','0','(obj data)']
+    # (Example) obj : ['1', '0', '(obj data)']
     for obj in objs:
         current_obj = obj[0]+' '+obj[1]
     
@@ -94,7 +94,7 @@ def NameDeObf(data):
 def PrintObjs():
     if type(parsed[current_obj]) == dict:
         for key in parsed[current_obj].keys():
-            print '%19s : %-19s' % (key,parsed[current_obj][key])
+            print '%19s : %-19s' % (key, parsed[current_obj][key])
     elif type(parsed[current_obj]) == list:
             print parsed[current_obj]
 
@@ -104,7 +104,7 @@ def ParseObj(contents):
         p = ParseDict(contents[2:-2])
         for x in p.keys():
             p[x] = ParseObj(p[x])
-            #print '%19s : %-19s' % (x,p[x])
+            #print '%19s : %-19s' % (x, p[x])
         return p
     
     elif contents[0] == '[':
@@ -125,7 +125,7 @@ def ParseDict(contents):
             break
         left_size += len(mName.group())
 
-        pRight = re.compile(r'\s*(.+)',re.DOTALL)
+        pRight = re.compile(r'\s*(.+)', re.DOTALL)
         mRight = pRight.match(contents[left_size:])
 
         if not mRight.group(1)[0] in '<[(':
@@ -180,7 +180,7 @@ def ParseArray(contents):
 
     while True:
 
-        pRight = re.compile(r'\s*(.+)',re.DOTALL)
+        pRight = re.compile(r'\s*(.+)', re.DOTALL)
         mRight = pRight.match(contents[left_size:])
 
         if not mRight:
@@ -205,7 +205,7 @@ def ParseArray(contents):
                             # case of space only in array : (ex. <</ABC [ ]>>)
                             break
                         else:
-                            print '[DEBUG] mRight.group():',mRight.group()
+                            print '[DEBUG] mRight.group():', mRight.group()
                             print 'Missing! in ParseArray()'
                             raise Exception
         elif mRight.group(1)[0] == '(':
@@ -239,9 +239,9 @@ def ParseArray(contents):
 ##############################################################################################################################
 def CreatePath(result):
     if type(result) == dict:
-        CreateDictPath('',result)
+        CreateDictPath(parent='', child=result)
     elif type(result) == list:
-        CreateArrayPath('',result)
+        CreateArrayPath(parent='', child=result)
     else:
         return
 
@@ -254,7 +254,7 @@ def CreatePath(result):
             new_paths.append(path)
     paths[current_obj] = sorted(new_paths)
     
-    for i,path in enumerate(paths[current_obj]):
+    for i, path in enumerate(paths[current_obj]):
         try:
             if path+'/' in paths[current_obj][i+1]:
                 del paths[current_obj][i]
@@ -262,27 +262,27 @@ def CreatePath(result):
             pass
 
 ##############################################################################################################################
-def CreateDictPath(parent,child):
+def CreateDictPath(parent, child):
     for brother in child.keys():
         if type(child[brother]) == dict:
-            CreateDictPath(parent+brother,child[brother])
+            CreateDictPath(parent=parent+brother, child=child[brother])
         elif type(child[brother]) == list:
-            CreateArrayPath(parent+brother,child[brother])
+            CreateArrayPath(parent=parent+brother, child=child[brother])
         else:
-            CreateAtherPath(parent+brother,child[brother])
+            CreateAtherPath(parent=parent+brother, child=child[brother])
 
 ##############################################################################################################################
-def CreateArrayPath(parent,child):
+def CreateArrayPath(parent, child):
     for brother in child:
         if type(brother) == dict:
-            CreateDictPath(parent,brother)
+            CreateDictPath(parent=parent, child=brother)
         elif type(brother) == list:
-            CreateArrayPath(parent,brother)
+            CreateArrayPath(parent=parent, child=brother)
         else:
-            CreateAtherPath(parent,brother)
+            CreateAtherPath(parent=parent, child=brother)
 
 ##############################################################################################################################
-def CreateAtherPath(parent,child):
+def CreateAtherPath(parent, child):
     m = pIndRef.match(child)
     if m:
         paths[current_obj].append(parent+'/'+child)
@@ -320,7 +320,7 @@ def SearchCatalog():
     return None
 
 ##############################################################################################################################
-def ResolvePath(key,parent_path=''):
+def ResolvePath(key, parent_path=''):
     global passed_obj
     if key in passed_obj:
         #output_file.write(parent_path + '\n')
@@ -333,7 +333,7 @@ def ResolvePath(key,parent_path=''):
             if m:
                 p_path = parent_path + path[:m.start()-1]
                 child_key = m.group()[:-2]
-                ResolvePath(child_key,p_path)
+                ResolvePath(child_key, p_path)
                 continue
             else:
                 print parent_path + path
@@ -366,9 +366,9 @@ def ParseObjStm(inner_objects):
         if not m:
             break
         left_size += len(m.group())
-        inner_offsets.append((m.group('num'),m.group('offset')))
+        inner_offsets.append((m.group('num'), m.group('offset')))
 
-    for key,offset in inner_offsets:
+    for key, offset in inner_offsets:
         current_obj = key + ' ' + '0'
 
         m = pDict.match(inner_objects[left_size:])
@@ -379,7 +379,7 @@ def ParseObjStm(inner_objects):
             if m:
                 left_size += len(m.group())
             else:
-                print '[DEBUG] The Object in this ObjStm is not Dict and Array.'
+                print '[DEBUG] The Object in this ObjStm is neither Dict nor Array.'
                 sys.exit(1)
 
         try:
