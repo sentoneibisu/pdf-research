@@ -1,3 +1,7 @@
 *.pdf
 *.pdf_
 *.txt
+*.db
+*.html
+*.png
+*.log
