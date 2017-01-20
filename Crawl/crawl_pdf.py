@@ -23,34 +23,18 @@ def write_log(message):
 
 
 def open_db():
+    write_log('[DEBUG] call: open_db()\n')
     dbname = 'crawl.db'
-    if os.path.exists(dbname):
-        conn = sqlite3.connect('crawl.db', isolation_level=None)
-        write_log('[+] Open: crawl.db\n')
-    else:
-        write_log('[DEBUG] call: open_db()\n')
+    conn = sqlite3.connect('crawl.db', isolation_level=None)
+    write_log('[+] Open: crawl.db\n')
+    if not os.path.exists(dbname):
         schema_fname = 'pdfs_schema.sql'
-        conn = sqlite3.connect('crawl.db', isolation_level=None)
-        write_log('[+] Open: crawl.db\n')
         with open(schema_fname, 'r') as f:
             schema = f.read()
         conn.executescript(schema)
         write_log('[+] Executescript: pdfs_schema.sql\n')
     cur = conn.cursor()
     return (conn, cur)
-
-    #write_log('[DEBUG] call: open_db()\n')
-    #schema_fname = 'pdfs_schema.sql'
-    #conn = sqlite3.connect('crawl.db', isolation_level=None)
-    #write_log('[+] Open: crawl.db\n')
-
-    #with open(schema_fname, 'r') as f:
-        #schema = f.read()
-    #conn.executescript(schema)
-    #write_log('[+] Executescript: pdfs_schema.sql\n')
-
-    #cur = conn.cursor()
-    #return (conn, cur)
 
 
 def insert_record(cur, url):
