@@ -22,13 +22,13 @@ def write_log(message):
     f_log.flush()
 
 
-def create_db():
+def open_db():
     dbname = 'crawl.db'
     if os.path.exists(dbname):
         conn = sqlite3.connect('crawl.db', isolation_level=None)
         write_log('[+] Open: crawl.db\n')
     else:
-        write_log('[DEBUG] call: create_db()\n')
+        write_log('[DEBUG] call: open_db()\n')
         schema_fname = 'pdfs_schema.sql'
         conn = sqlite3.connect('crawl.db', isolation_level=None)
         write_log('[+] Open: crawl.db\n')
@@ -39,7 +39,7 @@ def create_db():
     cur = conn.cursor()
     return (conn, cur)
 
-    #write_log('[DEBUG] call: create_db()\n')
+    #write_log('[DEBUG] call: open_db()\n')
     #schema_fname = 'pdfs_schema.sql'
     #conn = sqlite3.connect('crawl.db', isolation_level=None)
     #write_log('[+] Open: crawl.db\n')
@@ -68,7 +68,7 @@ def close_db(conn):
 
 def google_search(keywords):
     try:
-        conn, cur = create_db()
+        conn, cur = open_db()
         #driver = webdriver.PhantomJS()
         debug_count = 0
         for keyword in keywords:
