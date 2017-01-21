@@ -25,15 +25,19 @@ def write_log(message):
 def open_db():
     write_log('[DEBUG] call: open_db()\n')
     dbname = 'crawl.db'
-    conn = sqlite3.connect('crawl.db', isolation_level=None)
-    write_log('[+] Open: crawl.db\n')
-    if not os.path.exists(dbname):
+    if os.path.exists(dbname):
+        conn = sqlite3.connect('crawl.db', isolation_level=None)
+        write_log('[+] Open: crawl.db\n')
+        cur = conn.cursor()
+    else:
+        conn = sqlite3.connect('crawl.db', isolation_level=None)
+        write_log('[+] Open: crawl.db\n')
+        cur = conn.cursor()
         schema_fname = 'pdfs_schema.sql'
         with open(schema_fname, 'r') as f:
             schema = f.read()
         conn.executescript(schema)
         write_log('[+] Executescript: pdfs_schema.sql\n')
-    cur = conn.cursor()
     return (conn, cur)
 
 
