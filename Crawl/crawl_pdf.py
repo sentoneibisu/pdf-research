@@ -91,6 +91,7 @@ def google_search(restore_flg):
     try:
         conn, cur = open_db()
         debug_count = 0
+        driver = webdriver.PhantomJS()
         # 検索ドメイン毎のループ
         while True:
             if not restore_flg:
@@ -113,16 +114,17 @@ def google_search(restore_flg):
                     if restore_flg:
                         keyword, domain, start = restore_state()  # 状態の復元
                         restore_flg = False
+                    if start >= 30:
+                        break
                     write_log('[+] Count: {0}\n'.format(debug_count))
                     debug_count += 1
-                    driver = webdriver.PhantomJS()
                     url = 'https://www.google.co.jp' + \
                           '#q={0}+site:{1}+filetype:pdf'.format(keyword, domain) + \
                           '&filter=0&start={0}'.format(start) 
                     start += 10
             
                     driver.get(url)
-                    time.sleep(15)
+                    time.sleep(10)
                     driver.save_screenshot('ss.png')
                     html = driver.page_source.encode('utf-8')
                     bsObj = BeautifulSoup(html, "html.parser")
@@ -164,7 +166,6 @@ def google_search(restore_flg):
                             m = re.search(r'<a href="/url\?q=(.+\.pdf).+">', str(a))
                             pdf_url = m.group(1)
                             insert_record(cur, pdf_url, keyword, domain)
-                    driver.quit()
 
                 set_status_keyword_table(cur, keyword)
 
@@ -175,6 +176,7 @@ def google_search(restore_flg):
         write_log('[EXCEPT] {0}\n'.format(traceback.format_exc(sys.exc_info()[2])))
     finally:
         save_state(keyword, domain, start-10)
+        driver.quit()
         close_db(conn)
         f_log.close()
 
