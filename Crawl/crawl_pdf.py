@@ -7,6 +7,7 @@ import time
 import pickle
 import sqlite3
 import traceback
+import random
 from datetime import datetime
 from selenium import webdriver
 from bs4 import BeautifulSoup
@@ -124,7 +125,7 @@ def google_search(restore_flg):
                     start += 10
             
                     driver.get(url)
-                    time.sleep(10)
+                    time.sleep(random.randint(10, 20))
                     driver.save_screenshot('ss.png')
                     html = driver.page_source.encode('utf-8')
                     bsObj = BeautifulSoup(html, "html.parser")
