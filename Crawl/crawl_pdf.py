@@ -165,6 +165,9 @@ def google_search(restore_flg):
                     for a in aList:
                         if a.get_text() not in (u'類似ページ', u'キャッシュ'):
                             m = re.search(r'<a href="/url\?q=(.+\.pdf).+">', str(a))
+                            if m is None:
+                                print '[DEBUG] ', a
+                                continue
                             pdf_url = m.group(1)
                             insert_record(cur, pdf_url, keyword, domain)
 
